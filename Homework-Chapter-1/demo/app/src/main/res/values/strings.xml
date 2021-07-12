@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Test</string>
+    <string name="btn_change">更换文本内容</string>
+</resources>
