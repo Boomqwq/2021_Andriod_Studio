@@ -1,6 +1,7 @@
 package com.bytedance.camp.chapter4.widget;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -15,11 +16,18 @@ import android.webkit.WebHistoryItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bytedance.camp.chapter4.R;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 public class ClockView extends View {
+
+    private int mRoundcolor;
+    private int mHourcolor;
+    private int mMinutecolor;
+    private int mSecondcolor;
 
     private static final int FULL_CIRCLE_DEGREE = 360;
     private static final int UNIT_DEGREE = 6;
@@ -60,23 +68,32 @@ public class ClockView extends View {
     };
 
     public ClockView(Context context) {
-        super(context);
-        init();
+        this(context, null);
     }
 
     public ClockView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        init();
+        this(context, attrs, 0);
     }
+
+//    private ClockView_attr clockviewattr;
 
     public ClockView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        Log.d("TAG", "ClockView: ");
+//        clockviewattr = new ClockView_attr(context);
+        TypedArray ta=context.obtainStyledAttributes(attrs, R.styleable.ClockView,defStyleAttr,0);
+        mRoundcolor = ta.getColor(R.styleable.ClockView_round_color, Color.WHITE);
+        mHourcolor = ta.getColor(R.styleable.ClockView_hour_color, Color.WHITE);
+        mMinutecolor = ta.getColor(R.styleable.ClockView_minute_color, Color.WHITE);
+        mSecondcolor = ta.getColor(R.styleable.ClockView_second_color, Color.WHITE);
+        ta.recycle();
+//        clockviewattr.setmRoundcolor(Color.parseColor("#125864"));
+//        Log.d("TAG", "color: "+Color.parseColor("#125864"));
         init();
     }
 
     private void init() {
         unitPaint.setAntiAlias(true);
-        unitPaint.setColor(Color.WHITE);
         unitPaint.setStrokeWidth(UNIT_LINE_WIDTH);
         unitPaint.setStrokeCap(Paint.Cap.ROUND);
         unitPaint.setStyle(Paint.Style.STROKE);
@@ -142,6 +159,7 @@ public class ClockView extends View {
 
     // 绘制表盘上的刻度,以及中心的圆圈
     private void drawUnit(Canvas canvas) {
+        unitPaint.setColor(mRoundcolor);
         for (int i = 0; i < unitLinePositions.size(); i++) {
             if (i % 5 == 0) {
                 unitPaint.setAlpha(HIGHLIGHT_UNIT_ALPHA);
@@ -149,6 +167,8 @@ public class ClockView extends View {
                 unitPaint.setAlpha(NORMAL_UNIT_ALPHA);
             }
             RectF linePosition = unitLinePositions.get(i);
+
+            Log.d("TAG", " i: "+i+" drawcolor: "+unitPaint.getColor());
             canvas.drawLine(linePosition.left, linePosition.top, linePosition.right, linePosition.bottom, unitPaint);
         }
     }
@@ -185,10 +205,13 @@ public class ClockView extends View {
          float sec_endY = (float) (centerY + radius * SECOND_NEEDLE_LENGTH_RATIO * Math.sin(Math.toRadians(sec_Degree)));
 
          needlePaint.setStrokeWidth(HOUR_NEEDLE_WIDTH);
+         needlePaint.setColor(mHourcolor);
          canvas.drawLine(centerX, centerY, hour_endX, hour_endY, needlePaint);
          needlePaint.setStrokeWidth(MINUTE_NEEDLE_WIDTH);
+         needlePaint.setColor(mMinutecolor);
          canvas.drawLine(centerX, centerY, min_endX, min_endY, needlePaint);
          needlePaint.setStrokeWidth(SECOND_NEEDLE_WIDTH);
+         needlePaint.setColor(mSecondcolor);
          canvas.drawLine(centerX, centerY, sec_endX, sec_endY, needlePaint);
 
          unitPaint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -197,7 +220,6 @@ public class ClockView extends View {
          canvas.drawCircle(centerX,centerY,15,unitPaint);
          unitPaint.setColor(Color.argb(255,150,150,150));
          canvas.drawCircle(centerX,centerY,8,unitPaint);
-         unitPaint.setColor(Color.argb(255,255,255,255));
 
     }
 
